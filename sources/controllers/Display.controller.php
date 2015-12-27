@@ -654,6 +654,9 @@ class Display_Controller extends Action_Controller
 			$this->_template_layers->add('quickreply');
 		$this->_template_layers->add('pages_and_buttons');
 
+		// Give social networks some more info about the page
+		$this->openGraphHeaders();
+
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
 		call_integration_hook('integrate_mod_buttons');
@@ -879,5 +882,17 @@ class Display_Controller extends Action_Controller
 		$counter++;
 
 		return $output;
+	}
+
+	public function openGraphHeaders()
+	{
+		global $context;
+
+		$context['html_headers'] .= '
+			<meta property="og:url" content="' . $context['canonical_url'] . '" />
+			<meta property="og:sitename" content="' . $context['forum_name'] . '" />
+			<meta property="og:type" content="article" />
+			<meta property="og:title" content="' . $context['page_title'] . '" />
+		';
 	}
 }
