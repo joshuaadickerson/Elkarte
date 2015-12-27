@@ -797,7 +797,7 @@ class Profile_Controller extends Action_Controller
 		$context['html_headers'] .= '
 			<meta property="og:url" content="' . $context['canonical_url'] . '" />
 			<meta property="og:sitename" content="' . $context['forum_name'] . '" />
-			<meta property="og:type" content="article" />
+			<meta property="og:type" content="person" />
 			<meta property="og:title" content="' . $context['page_title'] . '" />
 			<meta property="og:image" content="' . $context['member']['avatar']['href'] . '" />
 		';
