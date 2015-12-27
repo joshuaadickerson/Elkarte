@@ -187,8 +187,6 @@ class Profile_Controller extends Action_Controller
 		// Set the page title if it's not already set...
 		if (!isset($context['page_title']))
 			$context['page_title'] = $txt['profile'] . (isset($txt[$this->_current_area]) ? ' - ' . $txt[$this->_current_area] : '');
-
-		$this->openGraphHeaders();
 	}
 
 	/**
@@ -787,19 +785,5 @@ class Profile_Controller extends Action_Controller
 				}
 			}
 		}
-	}
-
-
-	public function openGraphHeaders()
-	{
-		global $context;
-
-		$context['html_headers'] .= '
-			<meta property="og:url" content="' . $context['canonical_url'] . '" />
-			<meta property="og:sitename" content="' . $context['forum_name'] . '" />
-			<meta property="og:type" content="person" />
-			<meta property="og:title" content="' . $context['page_title'] . '" />
-			<meta property="og:image" content="' . $context['member']['avatar']['href'] . '" />
-		';
 	}
 }

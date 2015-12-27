@@ -241,6 +241,8 @@ class ProfileInfo_Controller extends Action_Controller
 		$modSettings['jquery_include_ui'] = true;
 		addInlineJavascript('
 		$(function() {$( "#tabs" ).tabs();});', true);
+
+		$this->openGraphHeaders();
 	}
 
 	/**
@@ -1238,5 +1240,18 @@ class ProfileInfo_Controller extends Action_Controller
 	public function list_getNumUnwatched()
 	{
 		return getNumUnwatchedBy($this->_memID);
+	}
+
+	public function openGraphHeaders()
+	{
+		global $context;
+
+		$context['html_headers'] .= '
+			<meta property="og:url" content="' . $context['canonical_url'] . '" />
+			<meta property="og:sitename" content="' . $context['forum_name'] . '" />
+			<meta property="og:type" content="person" />
+			<meta property="og:title" content="' . $context['page_title'] . '" />
+			<meta property="og:image" content="' . $context['member']['avatar']['href'] . '" />
+		';
 	}
 }
