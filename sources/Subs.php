@@ -2031,7 +2031,7 @@ function setupMenuContext()
 			),
 			'contact' => array(
 				'title' => $txt['contact'],
-				'href' => $scripturl . '?action=register;sa=contact',
+				'href' => $scripturl . '?action=about;sa=contact',
 				'data-icon' => '&#xf095;',
 				'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
 			),
@@ -2568,7 +2568,7 @@ function replaceBasicActionUrl($string)
 			$scripturl . '?action=recent',
 			$scripturl . '?action=search',
 			$scripturl . '?action=who',
-			$scripturl . '?action=who;sa=credits',
+			$scripturl . '?action=about;sa=credits',
 			$scripturl . '?action=calendar',
 			$scripturl . '?action=memberlist',
 			$scripturl . '?action=stats',
