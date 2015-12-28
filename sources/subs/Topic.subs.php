@@ -418,7 +418,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		cache_put_data('topic_board-' . $topic_id, null, 120);
 
 	// Maybe there's an addon that wants to delete topic related data of its own
-	call_integration_hook('integrate_remove_topics', array($topics));
+	Hooks::get()->hook('remove_topics', array($topics));
 
 	// Update the totals...
 	require_once(SUBSDIR . '/Messages.subs.php');

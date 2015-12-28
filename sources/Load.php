@@ -113,7 +113,7 @@ function reloadSettings()
 	call_integration_include_hook('integrate_pre_include');
 
 	// Call pre load integration functions.
-	Hooks::get()->hook('integrate_pre_load');
+	Hooks::get()->hook('pre_load');
 }
 
 /**
@@ -136,7 +136,7 @@ function loadUserSettings()
 	$cache = Cache::instance();
 
 	// Check first the integration, then the cookie, and last the session.
-	if (count($integration_ids = Hooks::get()->hook('integrate_verify_user')) > 0)
+	if (count($integration_ids = Hooks::get()->hook('verify_user')) > 0)
 	{
 		$id_member = 0;
 		foreach ($integration_ids as $integration_id)
@@ -378,7 +378,7 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
-	Hooks::get()->hook('integrate_user_info');
+	Hooks::get()->hook('user_info');
 }
 
 /**
@@ -473,7 +473,7 @@ function loadBoard()
 		$select_tables = array();
 
 		// Wanna grab something more from the boards table or another table at all?
-		Hooks::get()->hook('integrate_load_board_query', array(&$select_columns, &$select_tables));
+		Hooks::get()->hook('load_board_query', array(&$select_columns, &$select_tables));
 
 		$request = $db->query('', '
 			SELECT
@@ -571,7 +571,7 @@ function loadBoard()
 				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
 			}
 
-			Hooks::get()->hook('integrate_loaded_board', array(&$board_info, &$row));
+			Hooks::get()->hook('loaded_board', array(&$board_info, &$row));
 
 			if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))
 			{
@@ -877,7 +877,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Allow addons to easily add to the selected member data
-	Hooks::get()->hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $set));
+	Hooks::get()->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
 
 	if (!empty($users))
 	{
@@ -920,7 +920,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 
 	// Anything else integration may want to add to the user_profile array
 	if (!empty($new_loaded_ids))
-		Hooks::get()->hook('integrate_add_member_data', array($new_loaded_ids, $set));
+		Hooks::get()->hook('add_member_data', array($new_loaded_ids, $set));
 
 	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
 	{
@@ -1130,7 +1130,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		}
 	}
 
-	Hooks::get()->hook('integrate_member_context', array($user, $display_custom_fields));
+	Hooks::get()->hook('member_context', array($user, $display_custom_fields));
 	return true;
 }
 
@@ -1407,7 +1407,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$settings = array_merge($settings, template_init());
 
 	// Call initialization theme integration functions.
-	Hooks::get()->hook('integrate_init_theme', array($id_theme, &$settings));
+	Hooks::get()->hook('init_theme', array($id_theme, &$settings));
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
@@ -1467,7 +1467,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	call_integration_include_hook('integrate_theme_include');
 
 	// Call load theme integration functions.
-	Hooks::get()->hook('integrate_load_theme');
+	Hooks::get()->hook('load_theme');
 
 	// We are ready to go.
 	$context['theme_loaded'] = true;
@@ -2455,7 +2455,7 @@ function determineAvatar($profile)
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
-	Hooks::get()->hook('integrate_avatar', array(&$avatar));
+	Hooks::get()->hook('avatar', array(&$avatar));
 
 	return $avatar;
 }
@@ -2648,7 +2648,7 @@ function loadLoadAverage()
 	}
 
 	if ($context['load_average'] !== false)
-		Hooks::get()->hook('integrate_load_average', array($context['load_average']));
+		Hooks::get()->hook('load_average', array($context['load_average']));
 
 	// Let's have at least a zero
 	if (empty($modSettings['loadavg_forum']) || $context['load_average'] === false)
