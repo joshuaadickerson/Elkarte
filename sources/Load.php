@@ -82,28 +82,10 @@ function reloadSettings()
 	// Check the load averages?
 	if (!empty($modSettings['loadavg_enable']))
 	{
-		if (($modSettings['load_average'] = $cache->get('loadavg', 90)) == null)
-		{
-			require_once(SUBSDIR . '/Server.subs.php');
-			$modSettings['load_average'] = detectServerLoad();
-
-			$cache->put('loadavg', $modSettings['load_average'], 90);
-		}
-
-		if ($modSettings['load_average'] !== false)
-			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
-
-		// Let's have at least a zero
-		if (empty($modSettings['loadavg_forum']) || $modSettings['load_average'] === false)
-			$modSettings['current_load'] = 0;
-		else
-			$modSettings['current_load'] = $modSettings['load_average'];
-
-		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
-			Errors::instance()->display_loadavg_error();
+		loadLoadAverage();
 	}
 	else
-		$modSettings['current_load'] = 0;
+		$context['current_load'] = 0;
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
@@ -2651,4 +2633,44 @@ function loadBBCParsers()
 	{
 		\BBC\ParserWrapper::getInstance()->setDisabled($modSettings['disabledBBC']);
 	}
+}
+
+function loadLoadAverage()
+{
+	global $modSettings, $context;
+
+	$cache = Cache::instance();
+
+	if (($context['load_average'] = $cache->get('loadavg', 90)) == null)
+	{
+		require_once(SUBSDIR . '/Server.subs.php');
+		$context['load_average'] = detectServerLoad();
+
+		$cache->put('loadavg', $context['load_average'], 90);
+	}
+
+	if ($context['load_average'] !== false)
+		call_integration_hook('integrate_load_average', array($context['load_average']));
+
+	// Let's have at least a zero
+	if (empty($modSettings['loadavg_forum']) || $context['load_average'] === false)
+		$context['current_load'] = 0;
+	else
+		$context['current_load'] = $context['load_average'];
+
+	if (checkLoad('forum'))
+		Errors::instance()->display_loadavg_error();
+}
+
+/**
+ * Check if the load is higher than a threshold
+ *
+ * @param string $setting Part of the $modSettings key "loadavg_$setting"
+ * @return bool If the current load is over the threshold
+ */
+function checkLoad($setting)
+{
+	return !empty($context['current_load'])
+		&& !empty($modSettings['loadavg_' . $setting])
+		&& $context['current_load'] >= $modSettings['loadavg_' . $setting];
 }
