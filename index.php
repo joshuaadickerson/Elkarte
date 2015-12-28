@@ -115,6 +115,8 @@ $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 
+$elk = new Pimple\Container;
+
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
 	Debug::get()->rusage('start', $rusage_start);
