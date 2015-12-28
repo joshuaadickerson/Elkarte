@@ -140,6 +140,11 @@ reloadSettings();
 // Our good ole' contextual array, which will hold everything
 $context = array();
 
+$elk['errors'] = Errors::instance();
+$elk['db'] = database();
+$elk['cache'] = Cache::instance();
+$elk['hooks'] = Hooks::get();
+
 // Seed the random generator.
 elk_seed_generator();
 
@@ -172,6 +177,7 @@ Errors::instance()->register_handlers();
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();
+$elk['req'] = HttpReq::instance();
 
 // Restore post data if we are revalidating OpenID.
 if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]['post']) && empty($_POST))
@@ -181,7 +187,7 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 }
 
 // Pre-dispatch
-elk_main();
+elk_main($elk);
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -190,7 +196,7 @@ obExit(null, null, true);
  * The main dispatcher.
  * This delegates to each area.
  */
-function elk_main()
+function elk_main($elk)
 {
 	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 
@@ -235,7 +241,7 @@ function elk_main()
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		Errors::instance()->fatal_lang_error('not_a_topic', false);
+		$elk['errors']->fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
@@ -254,10 +260,10 @@ function elk_main()
 	unset($no_stat_actions);
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher();
+	$elk['dispatcher'] = new Site_Dispatcher();
 
 	// Show where we came from, and go
-	$context['site_action'] = $dispatcher->site_action();
+	$context['site_action'] = $elk['dispatcher']->site_action();
 	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
-	$dispatcher->dispatch();
+	$elk['dispatcher']->dispatch();
 }

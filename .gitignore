@@ -11,5 +11,6 @@ Packages/temp
 /site
 nbproject/*
 .*.swp
+/vendor/*
 /build/*
 .idea
