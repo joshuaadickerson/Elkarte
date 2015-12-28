@@ -1341,6 +1341,7 @@ function elk_seed_generator()
 /**
  * Process functions of an integration hook.
  *
+ * @deprecated as of 1.1b1
  * What it does:
  * - Calls all functions of the given hook.
  * - Supports static class method calls.
@@ -1357,6 +1358,7 @@ function call_integration_hook($hook, $parameters = array())
 /**
  * Includes files for hooks that only do that (i.e. integrate_pre_include)
  *
+ * @deprecated as of 1.1b1
  * @param string $hook The name to include
  */
 function call_integration_include_hook($hook)
@@ -1366,6 +1368,7 @@ function call_integration_include_hook($hook)
 
 /**
  * Special hook call executed during obExit
+ * @deprecated as of 1.1b1
  */
 function call_integration_buffer()
 {
@@ -1376,6 +1379,8 @@ function call_integration_buffer()
  * Add a function for integration hook.
  *
  * - Does nothing if the function is already added.
+ *
+ * @deprecated as of 1.1b1
  *
  * @param string $hook The name of the hook to add
  * @param string $function The function associated with the hook
@@ -1389,6 +1394,8 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 
 /**
  * Remove an integration hook function.
+ *
+ * @deprecated as of 1.1b1
  *
  * What it does:
  * - Removes the given function from the given hook.
