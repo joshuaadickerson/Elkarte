@@ -131,70 +131,60 @@ function template_display_message($id, array $msg, $ignoring = false)
 
 	// Show the message anchor and a "new" anchor if this message is new.
 	echo '
-				<div class="post_wrapper forumposts ', $msg['classes'], $msg['approved'] ? '' : ' approvebg', '" itemscope itemtype="http://schema.org/DiscussionForumPosting">', $msg['id'] != $context['first_message'] ? '
-					<a class="post_anchor" id="msg' . $id . '"></a>' . ($msg['first_new'] ? '<a id="new"></a>' : '') : '';
+		<div class="post_wrapper forumposts ', $msg['classes'], $msg['approved'] ? '' : ' approvebg', '" itemscope itemtype="http://schema.org/DiscussionForumPosting">', $msg['id'] != $context['first_message'] ? '
+			<a class="post_anchor" id="msg' . $id . '"></a>' . ($msg['first_new'] ? '<a id="new"></a>' : '') : '';
 
 	// Showing the sidebar posting area?
 	if (empty($options['hide_poster_area']))
-		echo '
-					<ul class="poster" itemprop="author" itemscope itemtype="http://schema.org/Person">',
-						template_build_poster_div($msg, $ignoring), '
-					</ul>';
-
-	echo '
-					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
-						<div class="keyinfo">
-						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($msg, $ignoring) . '</ul>' : '');
-
-	if (!empty($context['follow_ups'][$id]))
 	{
 		echo '
-							<ul class="quickbuttons follow_ups">
-								<li class="listlevel1 subsections" aria-haspopup="true">
-									<a class="linklevel1">', $txt['follow_ups'], '</a>
-									<ul class="menulevel2">';
-
-		foreach ($context['follow_ups'][$id] as $follow_up)
-			echo '
-										<li class="listlevel2">
-											<a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a>
-										</li>';
-
-		echo '
-									</ul>
-								</li>
-							</ul>';
+			<ul class="poster" itemprop="author" itemscope itemtype="http://schema.org/Person">',
+		template_build_poster_div($msg, $ignoring), '
+			</ul>';
 	}
 
 	echo '
-							<span id="post_subject_', $id, '" class="post_subject" itemprop="headline">', $msg['subject'], '</span>
-							<span id="messageicon_', $id, '" class="messageicon', ($msg['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
-								<img src="', $msg['icon_url'] . '" alt=""', $msg['can_modify'] ? ' id="msg_icon_' . $id . '"' : '', ' />
-							</span>
-							<h5 id="info_', $id, '">
-								<a href="', $msg['href'], '" rel="nofollow">', !empty($msg['counter']) ? sprintf($txt['reply_number'], $msg['counter']) : '', '</a>', !empty($msg['counter']) ? ' &ndash; ' : '', '<span itemprop="datePublished">' . $msg['html_time'] . '</span>', '
-							</h5>
-							<div id="msg_', $id, '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
-						</div>';
+		<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
+			<div class="keyinfo">
+			', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($msg, $ignoring) . '</ul>' : '');
+
+	if (!empty($context['follow_ups'][$id]))
+	{
+		template_display_follow_ups($id);
+	}
+
+	echo '
+			<span id="post_subject_', $id, '" class="post_subject" itemprop="headline">', $msg['subject'], '</span>
+			<span id="messageicon_', $id, '" class="messageicon', ($msg['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
+				<img src="', $msg['icon_url'] . '" alt=""', $msg['can_modify'] ? ' id="msg_icon_' . $id . '"' : '', ' />
+			</span>
+			<h5 id="info_', $id, '">
+				<a href="', $msg['href'], '" rel="nofollow">', !empty($msg['counter']) ? sprintf($txt['reply_number'], $msg['counter']) : '', '</a>', !empty($msg['counter']) ? ' &ndash; ' : '', '<span itemprop="datePublished">' . $msg['html_time'] . '</span>', '
+			</h5>
+			<div id="msg_', $id, '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
+		</div>';
 
 	// Ignoring this user? Hide the post.
 	if ($ignoring)
+	{
 		echo '
-						<div id="msg_', $id, '_ignored_prompt">
-							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $id, '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
-						</div>';
+			<div id="msg_', $id, '_ignored_prompt">
+				', $txt['ignoring_user'], '
+				<a href="#" id="msg_', $id, '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
+			</div>';
+	}
 
 	// Awaiting moderation?
 	if (!$msg['approved'] && $msg['member']['id'] != 0 && $msg['member']['id'] == $context['user']['id'])
+	{
 		echo '
-						<div class="approve_post">
-							', $txt['post_awaiting_approval'], '
-						</div>';
+			<div class="approve_post">
+				', $txt['post_awaiting_approval'], '
+			</div>';
+	}
 
 	// Show the post itself, finally!
-	echo '
-						<div id="msg_', $id, '" class="inner', $ignoring ? ' hide"' : '""', ' itemprop="articleBody">', $msg['body'], '</div>';
+	echo '<div id="msg_', $id, '" class="inner', $ignoring ? ' hide"' : '""', ' itemprop="articleBody">', $msg['body'], '</div>';
 
 	// Assuming there are attachments...
 	if (!empty($msg['attachment']))
@@ -202,121 +192,57 @@ function template_display_message($id, array $msg, $ignoring = false)
 
 	// Show the quickbuttons, for various operations on posts.
 	echo '
-						<ul id="buttons_', $id, '" class="quickbuttons">';
+		<ul id="buttons_', $id, '" class="quickbuttons">';
 
 	// Show a checkbox for quick moderation?
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $msg['can_remove'])
+	{
 		echo '
-							<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $id, '"></li>';
+			<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $id, '"></li>';
+	}
 
 	// Show "Last Edit: Time by Person" if this post was edited.
 	if ($settings['show_modify'])
+	{
 		echo '
-							<li id="modified_', $id, '" class="listlevel1 modified', !empty($msg['modified']['name']) ? '"' : ' hide"', ' itemprop="dateModified">
-								', !empty($msg['modified']['name']) ? $msg['modified']['last_edit_text'] : '', '
-							</li>';
+			<li id="modified_', $id, '" class="listlevel1 modified', !empty($msg['modified']['name']) ? '"' : ' hide"', ' itemprop="dateModified">
+				', !empty($msg['modified']['name']) ? $msg['modified']['last_edit_text'] : '', '
+			</li>';
+	}
 
 	// Maybe they can modify the post (this is the more button)
 	if ($msg['can_modify'] || ($context['can_report_moderator']))
-		echo '
-							<li class="listlevel1 subsections" aria-haspopup="true">
-								<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">', $txt['post_options'], '
-							</a>';
-
-	if ($msg['can_modify'] || $msg['can_remove'] || $context['can_follow_up'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $msg['can_approve'] || $msg['can_unapprove'] || $context['can_report_moderator'])
 	{
-		// Show them the other options they may have in a nice pulldown
 		echo '
-								<ul class="menulevel2">';
-
-		// Can the user modify the contents of this post?
-		if ($msg['can_modify'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=post;msg=', $id, ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel2 modify_button">', $txt['modify'], '</a>
-									</li>';
-
-		// How about... even... remove it entirely?!
-		if ($msg['can_remove'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel2 remove_button">', $txt['remove'], '</a>
-									</li>';
-
-		// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
-		if ($context['can_follow_up'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $id, ';followup=', $id, '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a>
-									</li>';
-
-		// What about splitting it off the rest of the topic?
-		if ($context['can_split'] && !empty($context['real_num_replies']) && $context['topic_first_message'] !== $id)
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $id, '" class="linklevel2 split_button">', $txt['split_topic'], '</a>
-									</li>';
-
-		// Can we restore topics?
-		if ($context['can_restore_msg'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=restoretopic;msgs=', $id, ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 restore_button">', $txt['restore_message'], '</a>
-									</li>';
-
-		// Maybe we can approve it, maybe we should?
-		if ($msg['can_approve'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 approve_button">', $txt['approve'], '</a>
-									</li>';
-
-		// Maybe we can unapprove it?
-		if ($msg['can_unapprove'])
-			echo '
-									<li class="listlevel2">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a>
-									</li>';
-
-		// Maybe they want to report this post to the moderator(s)?
-		if ($context['can_report_moderator'])
-			echo '
-									<li class="listlevel2">
-										<a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $msg['counter'] . ';msg=' . $id . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a>
-									</li>';
-
-		// Anything else added by mods for example?
-		if (!empty($context['additional_drop_buttons']))
-			foreach ($context['additional_drop_buttons'] as $key => $button)
-				echo '
-									<li class="listlevel2">
-										<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
-									</li>';
-
-		echo '
-								</ul>';
+			<li class="listlevel1 subsections" aria-haspopup="true">
+				<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">', $txt['post_options'], '</a>';
 	}
+
+	template_display_more_menu($id, $msg);
 
 	// Hide likes if its off
 	if ($msg['likes_enabled'])
 	{
 		// Can they like/unlike this post?
 		if ($msg['can_like'] || $msg['can_unlike'])
+		{
 			echo '
 							<li class="listlevel1', !empty($msg['like_counter']) ? ' liked"' : '"', '>
 								<a class="linklevel1 ', $msg['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($msg['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$id]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $id, ', ', $context['current_topic'], '); return false;">',
 			!empty($msg['like_counter']) ? '<span class="likes_indicator">' . $msg['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
-
+		}
 		// Or just view the count
 		else
+		{
 			echo '
 							<li class="listlevel1', !empty($msg['like_counter']) ? ' liked"' : '"', '>
 								<a href="javascript:void(0)" title="', !empty($msg['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$id]['member']) : '', '" class="linklevel1 likes_button">',
 			!empty($msg['like_counter']) ? '<span class="likes_indicator">' . $msg['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
 								</a>
 							</li>';
+		}
 	}
 
 	// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
@@ -913,4 +839,128 @@ function template_display_attachments($message, $ignoring)
 
 	echo '
 							</div>';
+}
+
+function template_display_follow_ups($id)
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+			<ul class="quickbuttons follow_ups">
+				<li class="listlevel1 subsections" aria-haspopup="true">
+					<a class="linklevel1">', $txt['follow_ups'], '</a>
+					<ul class="menulevel2">';
+
+	foreach ($context['follow_ups'][$id] as $follow_up)
+	{
+		echo '
+						<li class="listlevel2">
+							<a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a>
+						</li>';
+	}
+
+	echo '
+					</ul>
+				</li>
+			</ul>';
+}
+
+function template_display_more_menu($id, array $msg)
+{
+	global $context, $scripturl, $txt;
+
+	if ($msg['can_modify'] || $msg['can_remove'] || $context['can_follow_up']
+		|| ($context['can_split'] && !empty($context['real_num_replies']))
+		|| $context['can_restore_msg'] || $msg['can_approve'] || $msg['can_unapprove'] || $context['can_report_moderator'])
+	{
+		// Show them the other options they may have in a nice pulldown
+		echo '
+			<ul class="menulevel2">';
+
+		// Can the user modify the contents of this post?
+		if ($msg['can_modify'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=post;msg=', $id, ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel2 modify_button">', $txt['modify'], '</a>
+				</li>';
+		}
+
+		// How about... even... remove it entirely?!
+		if ($msg['can_remove'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel2 remove_button">', $txt['remove'], '</a>
+				</li>';
+		}
+
+		// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
+		if ($context['can_follow_up'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $id, ';followup=', $id, '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a>
+				</li>';
+		}
+
+		// What about splitting it off the rest of the topic?
+		if ($context['can_split'] && !empty($context['real_num_replies']) && $context['topic_first_message'] !== $id)
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $id, '" class="linklevel2 split_button">', $txt['split_topic'], '</a>
+				</li>';
+		}
+
+		// Can we restore topics?
+		if ($context['can_restore_msg'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=restoretopic;msgs=', $id, ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 restore_button">', $txt['restore_message'], '</a>
+				</li>';
+		}
+
+		// Maybe we can approve it, maybe we should?
+		if ($msg['can_approve'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 approve_button">', $txt['approve'], '</a>
+				</li>';
+		}
+
+		// Maybe we can unapprove it?
+		if ($msg['can_unapprove'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $id, ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a>
+				</li>';
+		}
+
+		// Maybe they want to report this post to the moderator(s)?
+		if ($context['can_report_moderator'])
+		{
+			echo '
+				<li class="listlevel2">
+					<a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $msg['counter'] . ';msg=' . $id . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a>
+				</li>';
+		}
+
+		// Anything else added by mods for example?
+		if (!empty($context['additional_drop_buttons']))
+		{
+			foreach ($context['additional_drop_buttons'] as $key => $button)
+			{
+				echo '
+					<li class="listlevel2">
+						<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
+					</li>';
+			}
+		}
+
+		echo '</ul>';
+	}
 }

@@ -322,7 +322,7 @@ function template_th_search_bar()
 	echo '
 			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
 				<label for="quicksearch">
-					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
+					<input type="search" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
 				</label>';
 
 	// Using the quick search dropdown?

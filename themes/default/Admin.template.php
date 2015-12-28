@@ -1096,7 +1096,7 @@ function template_admin_search_results()
 						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
 						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
 							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
-							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
+							<input type="search" name="search_term" value="', $context['search_term'], '" class="input_text" />
 							<input type="hidden" name="sa" value="', $context['search_type'], '" />
 							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" />
 						</form>
